@@ -1,0 +1,16 @@
+The input x and ouput y are not just guessing.
+We write how many examples we want the NN to memorize in x and what it wants to memorize it as in y.
+In adding two numbers we have only one solution so: (1D)
+    - [1,0,1,1] ---> x size = 4 #2+3 represented
+    - [1,1,1] ---> y size = 3 #5 represented
+
+But if we want to let the NN memorize multilple examples at once we do: (2D)
+    - [
+        [1,0,1,1], #2+3
+        [0,1,0,1]  #1+1
+    ] ----> x size = 4
+
+    -[
+        [1,1,1], #5
+        [0,1,0]  #2
+    ] -----> y size = 3
