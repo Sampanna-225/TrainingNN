@@ -1,0 +1,5 @@
+#cleanliness
+__pycache__/
+*.pyc
+
+
