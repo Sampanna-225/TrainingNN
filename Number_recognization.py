@@ -8,10 +8,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from NetBrain import NeuralBrain
 
-x1 = np.array([[0,0],[0,0],[1,1],[0,1]]) #2+3 on binary
-y1 = np.array([[0],[1],[0],[1]]) # five in binary
+x1 = np.array([[1,0,1,1]]) #2+3 on binary
+y1 = np.array([[1,0,1]]) # five in binary
 
-model = NeuralBrain(x1,y1,input_size=2 , hidden_size=4 , output_size=3,lr=0.1)
-model.train(10000)
-_,final=model.forward_propagation(x1)
+model = NeuralBrain(x1,y1,input_size=4 , hidden_size=6 , output_size=3,lr=0.01)
+model.train(100000)
+final=model.forward_propagation(x1)
+print(final)
 model.graphplot()
