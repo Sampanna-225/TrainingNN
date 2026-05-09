@@ -65,9 +65,13 @@ class NeuralBrain:
             self.backward_propagation(b)
             if epoch % 2000 == 0 :
                 loss = np.mean((self.y-b)**2)
-                self.loss_history.append(loss) # to know learning rate
-                print(f"Loss {epoch} = {loss:.4f}")
-    
+                roundloss = round(loss,5)
+                self.loss_history.append(roundloss) # to know learning rate
+                if len(self.loss_history) >=10 and self.loss_history[-10:].count(roundloss)==10:
+                    return #stop if repetative small iterations
+                    
+                print(f"Loss {epoch} = {loss:.5f}")
+            
     def graphplot(self):
         if not self.loss_history:
             print("error no loss detected")
