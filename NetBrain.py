@@ -65,10 +65,10 @@ class NeuralBrain:
             self.backward_propagation(b)
             if epoch % 2000 == 0 :
                 loss = np.mean((self.y-b)**2)
-                roundloss = round(loss,5)
-                self.loss_history.append(roundloss) # to know learning rate
-                if len(self.loss_history) >=10 and self.loss_history[-10:].count(roundloss)==10:
-                    return #stop if repetative small iterations
+                self.loss_history.append(loss) # to know learning rate
+                if len(self.loss_history) >=10:
+                    if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-6:
+                        return #Float Point Precision tuning
                     
                 print(f"Loss {epoch} = {loss:.5f}")
             
