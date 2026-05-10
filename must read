@@ -19,3 +19,15 @@ But if we want to let the NN memorize multilple examples at once we do: (2D)
 
     # this is due to matrix multiplication
     # also the layers only depend upon howmany features a example has not the number of examples passed throgh it.
+
+    # If a number is to be recognized form 1 to 10 the output cant simply be the number it needs to be represented as 0 or 1 so we use 
+    y1 = np.array([[1,0,0,0,0,0,0,0,0,0],
+               [0,1,0,0,0,0,0,0,0,0],
+               [0,0,1,0,0,0,0,0,0,0],
+               [0,0,0,1,0,0,0,0,0,0],
+               [0,0,0,0,1,0,0,0,0,0],
+               [0,0,0,0,0,1,0,0,0,0],
+               [0,0,0,0,0,0,1,0,0,0],
+               [0,0,0,0,0,0,0,1,0,0],
+               [0,0,0,0,0,0,0,0,1,0],
+               [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
