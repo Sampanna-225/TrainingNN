@@ -47,6 +47,7 @@ a = int(input("Enter a number "))
 
 final=model.forward_propagation([[a]])
 model.learn()
+
 print(final)
 print(model.softmax(final))
 print(f"The guessed number is {sets[np.argmax(model.softmax(final))]}")

@@ -1,11 +1,30 @@
-#cleanliness
-__pycache__/
-*.pyc
+# --- Neural Network Data ---
+# Exclude the "brain" weights and biases files
+*.npz
+*.npy
 
-
-# Virtual Environment
+# --- Environment & Dependencies ---
+# Exclude the virtual environment folder you mentioned
 .venv/
-venv/
 env/
-bin/
-lib/
+venv/
+ENV/
+
+# --- Python Artifacts ---
+# Exclude compiled python files and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- System & IDE ---
+# Exclude OS-generated files and IDE settings (VS Code/PyCharm)
+.DS_Store
+.vscode/
+.idea/
+
+# --- Future-Proofing ---
+# Exclude PyTorch/TensorFlow models when you shift later
+*.pt
+*.pth
+*.h5
+*.pb
