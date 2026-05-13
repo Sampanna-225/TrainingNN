@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt #pyplot helps run plot function
 
 def sigmoid(x): #to get non linear output
@@ -18,7 +19,10 @@ class NeuralBrain:
         self.y = y
         self.lr = lr
         self.loss_history=[] 
-
+        self.dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder
+        self.file_path = os.path.basename(__file__)# file path
+        self.file_name = os.path.join(self.dir_path,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
+        
         # takes random value for weight of range of input layer to hidden layer
         self.__W1 = np.random.rand(self.input_size,self.hidden_size)
         # takes bias value for hidden layer
@@ -76,6 +80,21 @@ class NeuralBrain:
         self.numerator = np.exp(input - np.max(input))
         self.denomenator = np.sum(self.numerator)
         return (self.numerator/self.denomenator)*100
+    
+    def learn(self):
+        np.savez_compressed(self.file_name,w1=self.__W1,w2=self.__W2,b1=self.__B1,b2 = self.__B2)
+        print("Saved successfully")
+
+    def remember(self):
+        if os.path.exists(self.file_name):
+            if os.path.getsize(self.file_name)>0:
+                data = np.load(self.file_name)
+                self.__W1 = data['w1']
+                self.__W2 = data['w2']
+                self.__B1 = data['b1']
+                self.__B2 = data['b2']
+        else:
+            print("No FILE found !!!")
             
     def graphplot(self):
         if not self.loss_history:
