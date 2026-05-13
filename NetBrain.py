@@ -71,6 +71,11 @@ class NeuralBrain:
                         return #Float Point Precision tuning
                     
                 print(f"Loss {epoch} = {loss:.5f}")
+
+    def softmax(self,input): #softmax function that helps calculate the certainty
+        self.numerator = np.exp(input - np.max(input))
+        self.denomenator = np.sum(self.numerator)
+        return (self.numerator/self.denomenator)*100
             
     def graphplot(self):
         if not self.loss_history:

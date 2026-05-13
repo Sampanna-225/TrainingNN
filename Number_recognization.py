@@ -31,9 +31,13 @@ y1 = np.array([[1,0,0,0,0,0,0,0,0,0],
                [0,0,0,0,0,0,0,0,1,0],
                [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
 
+sets = [1,2,3,4,5,6,7,8,10]
+
 model = NeuralBrain(x1,y1,input_size=1 , hidden_size=10 , output_size=10,lr=0.01)
 model.train(1000000)
-a = int(input("Enter a number"))
+a = int(input("Enter a number "))
 final=model.forward_propagation([[a]])
 print(final)
+print(model.softmax(final))
+print(f"The guessed number is {sets[np.argmax(model.softmax(final))]}")
 model.graphplot()
