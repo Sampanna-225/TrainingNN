@@ -7,6 +7,9 @@ import cv2 #for opatmized image processing
 import time
 import threading # allows alloation of threads and lets code work parallely
 from NetBrain import NeuralBrain
+from animation import loading_screen
+from animation import parallel_screen
+from animation import dot_animation
 
 #this tells the Python just where the file is located as im having a issue importing class
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -14,26 +17,7 @@ dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the
 file_path = os.path.basename(__file__)# file path
 file_name = os.path.join(dir_path,f"{os.path.splitext(file_path)[0]}.npz")# remove extension
 
-def loading_screen(duration=3):
-    print("Initializing NeuralBrain...")
-    chars = ["/", "-", "\\", "|"] # The rotating animation
-    end_time = time.time() + duration
-    
-    while time.time() < end_time:
-        for char in chars:
-            # \r moves the cursor to the start of the line
-            sys.stdout.write(f"\rLoading {char} ")
-            sys.stdout.flush() # to load the line immediately 
-            time.sleep(0.1)
 
-def parallel_screen(stop_command):
-    chars = ["/", "-", "\\", "|"] # The rotating animation
-    while not stop_command.is_set():
-        for c in chars:
-            sys.stdout.write(f"\rTraining NN {c}")
-            sys.stdout.flush()
-            time.sleep(0.1)#delay
-    sys.stdout.write("Training Complete")
 
 # Assigning a thread event
 stop_spinning = threading.Event()
@@ -69,7 +53,7 @@ model = NeuralBrain(x1,y1,input_size=1 , hidden_size=10 , output_size=10,lr=0.01
 while(True):
     os.system('cls')
     loading_screen()
-    print("Here are the options:\n1) Train file\n2) Run Trained file\n3) Remove Trained Data\n")
+    print("Here are the options:\n1) Train file\n2) Run Trained file\n3) Remove Trained Data\n4) To Exit")
 
     ask = int(input("Your Answer: "))
     match ask:
@@ -102,8 +86,13 @@ while(True):
                 loading_screen()
                 model.forget()
         
+        case 4:
+            dot_animation()
+            break
         case _:
             print("Wrong input:-->")
+            print("Restarting")
+            time.sleep(1)
             continue
     
     ask = int(input("101 to exit -->"))
