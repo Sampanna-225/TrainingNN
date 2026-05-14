@@ -71,15 +71,15 @@ class NeuralBrain:
                 loss = np.mean((self.y-b)**2)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
-                    if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-6:
+                    if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-8:
                         return #Float Point Precision tuning
                     
-                print(f"Loss {epoch} = {loss:.5f}")
+                # print(f"Loss {epoch} = {loss:.5f}")
 
-    def softmax(self,input): #softmax function that helps calculate the certainty
-        self.numerator = np.exp(input - np.max(input))
+    def softmax(self): #softmax function that helps calculate the certainty
+        self.numerator = np.exp(self.z2 - np.max(self.z2))
         self.denomenator = np.sum(self.numerator)
-        return (self.numerator/self.denomenator)*100
+        return (self.numerator/self.denomenator)
     
     def learn(self):
         np.savez_compressed(self.file_name,w1=self.__W1,w2=self.__W2,b1=self.__B1,b2 = self.__B2)
@@ -93,6 +93,12 @@ class NeuralBrain:
                 self.__W2 = data['w2']
                 self.__B1 = data['b1']
                 self.__B2 = data['b2']
+        else:
+            print("No FILE found !!!")
+    
+    def forget(self):
+        if os.path.exists(self.file_name):
+            os.remove(self.file_name)
         else:
             print("No FILE found !!!")
             
