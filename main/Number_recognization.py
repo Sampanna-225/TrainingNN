@@ -6,17 +6,20 @@ import gzip #to handle and decompress data
 import cv2 #for opatmized image processing
 import time
 import threading # allows alloation of threads and lets code work parallely
-from NetBrain import NeuralBrain
-from animation import loading_screen
-from animation import parallel_screen
-from animation import dot_animation
 
-#this tells the Python just where the file is located as im having a issue importing class
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#this tells the Python just where the file is located as im having a issue importing class adds location of parent file
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder
+parent_dir = os.path.dirname(dir_path)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
 file_path = os.path.basename(__file__)# file path
 file_name = os.path.join(dir_path,f"{os.path.splitext(file_path)[0]}.npz")# remove extension
 
+from brain.NetBrain import NeuralBrain
+from ui.animation import loading_screen
+from ui.animation import parallel_screen
+from ui.animation import dot_animation
 
 
 # Assigning a thread event
@@ -47,7 +50,8 @@ y1 = np.array([[1,0,0,0,0,0,0,0,0,0],
                [0,0,0,0,0,0,0,0,1,0],
                [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
 
-sets = [1,2,3,4,5,6,7,8,10]
+sets = [1,2,3,4,5,6,7,8,9] # for normal number guessing
+sets_adv = [0,1,2,3,4,5,6,7,8,9] # for MINST label
 
 model = NeuralBrain(x1,y1,input_size=1 , hidden_size=10 , output_size=10,lr=0.01)
 while(True):
@@ -81,7 +85,8 @@ while(True):
                 final=model.forward_propagation([[a]])
                 print(final)
                 print("Softmax: ")
-                print(model.softmax)
+                print(model.softmax())
+                print(f"The guess is : {sets[np.argmax(model.softmax())]}")
             except:
                 print("Enter a number !!!!!")
                 

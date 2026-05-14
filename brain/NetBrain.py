@@ -28,9 +28,11 @@ class NeuralBrain:
         self.y = y
         self.lr = lr
         self.loss_history=[] 
-        self.dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder
+        self.dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder to brain
+        self.project_root = os.path.dirname(self.dir_path) # sets the directry one level up to initial file
+        self.data_folder = os.path.join(self.project_root,"data")
         self.file_path = os.path.basename(__file__)# file path
-        self.file_name = os.path.join(self.dir_path,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
+        self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
         
         # takes random value for weight of range of input layer to hidden layer
         self.__W1 = np.random.rand(self.input_size,self.hidden_size)
