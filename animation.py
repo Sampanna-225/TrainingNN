@@ -1,7 +1,8 @@
 import sys
 import time
+import threading
 
-def loading_screen(duration=3):
+def loading_screen(duration:int=3) -> None:
     print("Initializing NeuralBrain...")
     chars = ["/", "-", "\\", "|"] # The rotating animation
     end_time = time.time() + duration
@@ -13,7 +14,7 @@ def loading_screen(duration=3):
             sys.stdout.flush() # to load the line immediately 
             time.sleep(0.1)
 
-def parallel_screen(stop_command):
+def parallel_screen(stop_command: threading.Event)->None:
     chars = ["/", "-", "\\", "|"] # The rotating animation
     while not stop_command.is_set():
         for c in chars:
@@ -22,7 +23,7 @@ def parallel_screen(stop_command):
             time.sleep(0.1)#delay
     sys.stdout.write("Training Complete")
 
-def dot_animation(duration=1):
+def dot_animation(duration:int=1)->None:
     end = time.time() + duration
     chars = ['-','*-','**-','***-','****-','*****-',"******"]
     while time.time() < end:

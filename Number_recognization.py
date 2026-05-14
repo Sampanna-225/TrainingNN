@@ -54,8 +54,10 @@ while(True):
     os.system('cls')
     loading_screen()
     print("Here are the options:\n1) Train file\n2) Run Trained file\n3) Remove Trained Data\n4) To Exit")
-
-    ask = int(input("Your Answer: "))
+    try:
+        ask = int(input("Your Answer: "))
+    except:
+        print("Error Enter Number!!!")
     match ask:
         case 1:
             stop_spinning.clear() # clears set if True
@@ -74,21 +76,34 @@ while(True):
         
         case 2:
             model.remember()
-            a = int(input("Enter a number "))
-            final=model.forward_propagation([[a]])
-            print(final)
-            print("Softmax: ")
-            print(model.softmax)
+            try:
+                a = int(input("Enter a number "))
+                final=model.forward_propagation([[a]])
+                print(final)
+                print("Softmax: ")
+                print(model.softmax)
+            except:
+                print("Enter a number !!!!!")
+                
+            
 
         case 3:
-            ask = int(input("Do you really want to delete(1/0)"))
-            if ask == 1:
-                loading_screen()
-                model.forget()
+            
+            try:
+                 ask = int(input("Do you really want to delete(1/0)"))
+                 if ask == 1:
+                    loading_screen()
+                    model.forget()
+                 
+            except:
+                 print("Enter a number !!!!!")
+
+            
         
         case 4:
             dot_animation()
             break
+
         case _:
             print("Wrong input:-->")
             print("Restarting")

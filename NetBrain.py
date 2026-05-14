@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt #pyplot helps run plot function
+from typing import Optional,List
 
 def sigmoid(x): #to get non linear output
     return 1/(1+np.exp(-x))
@@ -35,7 +36,7 @@ class NeuralBrain:
                                                  #zeros as starting 0 is inital
                         
     
-    def forward_propagation(self,x):
+    def forward_propagation(self, x:np.ndarray) -> np.ndarray:
         # from input to hidden tinkering with weight and bias
         # directly passed x helps reusability
         self.z1 = np.dot(x,self.__W1) + self.__B1 #Main concept == x.__W1 + __B1 __> output of hidden layer
@@ -46,7 +47,7 @@ class NeuralBrain:
         self.a2 = sigmoid(self.z2) #activation function
         return self.a2 #final output of forward propagation
 
-    def backward_propagation(self,output):
+    def backward_propagation(self, output:np.ndarray) -> None:
         # from output to hidden layer
         self.error = self.y - output 
         self.error_slope = sigmoid_derivative(output)*self.error
@@ -63,7 +64,7 @@ class NeuralBrain:
         self.__W1 += self.x.T.dot(self.hidden_error_slope)*self.lr # based on value they recieve so x
         self.__B1 += np.sum(self.hidden_error_slope,axis=0,keepdims=True)*self.lr
 
-    def train(self,process):
+    def train(self,process:int) -> None:
         for epoch in range(process):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
@@ -76,16 +77,16 @@ class NeuralBrain:
                     
                 # print(f"Loss {epoch} = {loss:.5f}")
 
-    def softmax(self): #softmax function that helps calculate the certainty
+    def softmax(self) -> np.ndarray: #softmax function that helps calculate the certainty
         self.numerator = np.exp(self.z2 - np.max(self.z2))
         self.denomenator = np.sum(self.numerator)
         return (self.numerator/self.denomenator)
     
-    def learn(self):
+    def learn(self) -> None:
         np.savez_compressed(self.file_name,w1=self.__W1,w2=self.__W2,b1=self.__B1,b2 = self.__B2)
         print("Saved successfully")
 
-    def remember(self):
+    def remember(self) -> None:
         if os.path.exists(self.file_name):
             if os.path.getsize(self.file_name)>0:
                 data = np.load(self.file_name)
@@ -96,13 +97,13 @@ class NeuralBrain:
         else:
             print("No FILE found !!!")
     
-    def forget(self):
+    def forget(self) -> None:
         if os.path.exists(self.file_name):
             os.remove(self.file_name)
         else:
             print("No FILE found !!!")
             
-    def graphplot(self):
+    def graphplot(self) -> None:
         if not self.loss_history:
             print("error no loss detected")
             return
