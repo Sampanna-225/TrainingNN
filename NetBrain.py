@@ -11,7 +11,15 @@ def sigmoid_derivative(x): #to get the derivative of sigmoid function
 
 #Functions like input layer --> hidden layer --> output layer
 # Class creation for training
+
 class NeuralBrain:
+    """
+    A class that acts as a Neural Network bias and tools of viewing or managing it 
+
+    Handles training, forward/backward propagation, and weight persistence
+    using NumPy and file-system modules.
+
+    """
     def __init__(self,x,y,input_size,hidden_size,output_size,lr):
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -37,6 +45,16 @@ class NeuralBrain:
                         
     
     def forward_propagation(self, x:np.ndarray) -> np.ndarray:
+        """
+        Standard process of forward biasing with equation x.w + b to alter data each layer
+
+        Args:
+            x (np.ndarray): The input feature matrix.
+            
+        Returns:
+            np.ndarray: The activated output of the final layer.
+        """
+
         # from input to hidden tinkering with weight and bias
         # directly passed x helps reusability
         self.z1 = np.dot(x,self.__W1) + self.__B1 #Main concept == x.__W1 + __B1 __> output of hidden layer
@@ -48,6 +66,16 @@ class NeuralBrain:
         return self.a2 #final output of forward propagation
 
     def backward_propagation(self, output:np.ndarray) -> None:
+        """
+        backwards checking with error gradient wise change.
+
+        Args:
+            x (np.ndarray): The input feature matrix
+        
+        Return:
+            None
+
+        """
         # from output to hidden layer
         self.error = self.y - output 
         self.error_slope = sigmoid_derivative(output)*self.error
@@ -65,6 +93,15 @@ class NeuralBrain:
         self.__B1 += np.sum(self.hidden_error_slope,axis=0,keepdims=True)*self.lr
 
     def train(self,process:int) -> None:
+        """
+        Trains the data and appends the loss with each successive epoch.
+
+        Args:
+            int 
+        
+        Return:
+            None
+        """
         for epoch in range(process):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
@@ -87,23 +124,37 @@ class NeuralBrain:
         print("Saved successfully")
 
     def remember(self) -> None:
-        if os.path.exists(self.file_name):
-            if os.path.getsize(self.file_name)>0:
-                data = np.load(self.file_name)
-                self.__W1 = data['w1']
-                self.__W2 = data['w2']
-                self.__B1 = data['b1']
-                self.__B2 = data['b2']
-        else:
-            print("No FILE found !!!")
+        """
+        Attempts to load the weights and bias from the save file (.npz)
+
+        Will return "File Maybe Corrupted" if the load hits an error
+        """
+        try:
+            if os.path.exists(self.file_name):
+                if os.path.getsize(self.file_name)>0:
+                    data = np.load(self.file_name)
+                    self.__W1 = data['w1']
+                    self.__W2 = data['w2']
+                    self.__B1 = data['b1']
+                    self.__B2 = data['b2']
+            else:
+                print("No FILE found !!!")
+        except Exception as e: # to view exactly what has happened
+            print(f"File Maybe corrupted: ({e})")
     
     def forget(self) -> None:
+        """
+        Deletes the existing file.
+        """
         if os.path.exists(self.file_name):
             os.remove(self.file_name)
         else:
             print("No FILE found !!!")
             
     def graphplot(self) -> None:
+        """
+        Graphical representation of data and loss per epoch.
+        """
         if not self.loss_history:
             print("error no loss detected")
             return
