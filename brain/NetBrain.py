@@ -105,7 +105,7 @@ class NeuralBrain:
         Return:
             None
         """
-        for epoch in tqdm(range(process)):
+        for epoch in range(process):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
             if epoch % 2000 == 0 :
