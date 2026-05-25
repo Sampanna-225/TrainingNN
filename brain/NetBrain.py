@@ -2,6 +2,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt #pyplot helps run plot function
 from typing import Optional,List
+from tqdm import tqdm
 
 def sigmoid(x): #to get non linear output
     return 1/(1+np.exp(-x))
@@ -104,7 +105,7 @@ class NeuralBrain:
         Return:
             None
         """
-        for epoch in range(process):
+        for epoch in tqdm(range(process)):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
             if epoch % 2000 == 0 :

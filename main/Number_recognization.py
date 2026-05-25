@@ -6,6 +6,7 @@ import gzip #to handle and decompress data
 import cv2 #for opatmized image processing
 import time
 import threading # allows alloation of threads and lets code work parallely
+from tqdm import tqdm
 
 #this tells the Python just where the file is located as im having a issue importing class adds location of parent file
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
