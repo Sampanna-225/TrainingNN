@@ -5,7 +5,8 @@ from typing import Optional,List
 from tqdm import tqdm
 
 def sigmoid(x): #to get non linear output
-    return 1/(1+np.exp(-x))
+    return 1.0/(1.0 + np.exp(-np.clip(x,-500,500)))# clip max and min 
+
 def sigmoid_derivative(x): #to get the derivative of sigmoid function
     return x*(1-x) # expected value of sigmoid function 
 
@@ -19,6 +20,7 @@ class NeuralBrain:
 
     Handles training, forward/backward propagation, and weight persistence
     using NumPy and file-system modules.
+    As the input and hidden layers grows the unscaled weights give out massive negative or positive number causing gradient to be flatlined. So the square root is scaled with the number of layers to impact the weights 
 
     """
     def __init__(self,x,y,input_size,hidden_size,output_size,lr):
@@ -36,12 +38,12 @@ class NeuralBrain:
         self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
         
         # takes random value for weight of range of input layer to hidden layer
-        self.__W1 = np.random.rand(self.input_size,self.hidden_size)
+        self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(2.0 / self.input_size)#randn gives +ve to -ve value
         # takes bias value for hidden layer
-        self.__B1 = np.zeros((1,self.hidden_size))# 1 to avoid shape mismatch
+        self.__B1 = np.zeros((1,self.hidden_size))* np.sqrt(2.0 / self.hidden_size)# 1 to avoid shape mismatch
                                                 #zeros as starting 0 is inital
         # takes random value for weight of range of hidden layer to output layer
-        self.__W2 = np.random.rand(self.hidden_size,self.output_size)
+        self.__W2 = np.random.randn(self.hidden_size,self.output_size)
         # takes bias value for output layer
         self.__B2 = np.zeros((1,self.output_size)) # 1 to avoid shape mismatch
                                                  #zeros as starting 0 is inital
@@ -77,23 +79,25 @@ class NeuralBrain:
         
         Return:
             None
+        
+        We use gradient decent -= rather than += becuase we want to oppose the direction for the error gradient to make it as mininmum error as possible.
 
         """
         # from output to hidden layer
-        self.error = self.y - output 
+        self.error = output - self.y #to know if the output obtained is greater or less than the required output.  
         self.error_slope = sigmoid_derivative(output)*self.error
 
-        #from hidden to output layer
+        #from hidden to input layer
         self.hidden_error = self.error_slope.dot(self.__W2.T) #==> matrix 3*2 . 2*3 == 3*3
         self.hidden_error_slope = sigmoid_derivative(self.a1)*self.hidden_error
 
         #correcting values form output to hidden layer
-        self.__W2 += self.a1.T.dot(self.error_slope)*self.lr # matrix multiplication dimensions. => based on value they recieve so hidden output
-        self.__B2 += np.sum(self.error_slope,axis=0,keepdims=True)*self.lr #axis = 0 collapising rows
+        self.__W2 -= self.a1.T.dot(self.error_slope)*self.lr # matrix multiplication dimensions. => based on value they recieve so hidden output
+        self.__B2 -= np.sum(self.error_slope,axis=0,keepdims=True)*self.lr #axis = 0 collapising rows
         
         #correcting calues from hidden to outpu layer
-        self.__W1 += self.x.T.dot(self.hidden_error_slope)*self.lr # based on value they recieve so x
-        self.__B1 += np.sum(self.hidden_error_slope,axis=0,keepdims=True)*self.lr
+        self.__W1 -= self.x.T.dot(self.hidden_error_slope)*self.lr # based on value they recieve so x
+        self.__B1 -= np.sum(self.hidden_error_slope,axis=0,keepdims=True)*self.lr
 
     def train(self,process:int) -> None:
         """
@@ -105,10 +109,10 @@ class NeuralBrain:
         Return:
             None
         """
-        for epoch in range(process):
+        for epoch in tqdm(range(process)):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
-            if epoch % 2000 == 0 :
+            if epoch % 500 == 0 :
                 loss = np.mean((self.y-b)**2)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
@@ -117,14 +121,15 @@ class NeuralBrain:
                     
                 # print(f"Loss {epoch} = {loss:.5f}")
 
-    def softmax(self) -> np.ndarray: #softmax function that helps calculate the certainty
-        self.numerator = np.exp(self.z2 - np.max(self.z2))
+    def softmax(self) -> np.ndarray: #softmax function that helps calculate the certainty e^x/sum(e^x)
+        self.numerator = np.exp(self.z2)
         self.denomenator = np.sum(self.numerator)
         return (self.numerator/self.denomenator)
     
     def learn(self) -> None:
         np.savez_compressed(self.file_name,w1=self.__W1,w2=self.__W2,b1=self.__B1,b2 = self.__B2)
         print("Saved successfully")
+        print(self.loss_history)
 
     def remember(self) -> None:
         """
@@ -180,7 +185,7 @@ if __name__ == "__main__":
                 [0]])
 
     model = NeuralBrain(x,y,input_size=2,hidden_size=4,output_size=1,lr=0.1)
-    model.train(process=100000)
-    final = model.forward_propagation(x) 
-    print(final)
+    model.train(process=100000) 
+    model.forward_propagation(x)
+    # print(model.softmax())
     model.graphplot()

@@ -21,40 +21,44 @@ from brain.NetBrain import NeuralBrain
 from ui.animation import loading_screen
 from ui.animation import parallel_screen
 from ui.animation import dot_animation
-
+from data.unzip import X_image
+from data.unzip import X_image_test
+from data.unzip import Y_label
+from data.unzip import y_label_test
 
 # Assigning a thread event
 stop_spinning = threading.Event()
 
 
 
-x1 = np.array([
-    [1],
-    [2],
-    [3],
-    [4],
-    [5],
-    [6],
-    [7],
-    [8],
-    [9],
-    [10]
-]) 
-y1 = np.array([[1,0,0,0,0,0,0,0,0,0],
-               [0,1,0,0,0,0,0,0,0,0],
-               [0,0,1,0,0,0,0,0,0,0],
-               [0,0,0,1,0,0,0,0,0,0],
-               [0,0,0,0,1,0,0,0,0,0],
-               [0,0,0,0,0,1,0,0,0,0],
-               [0,0,0,0,0,0,1,0,0,0],
-               [0,0,0,0,0,0,0,1,0,0],
-               [0,0,0,0,0,0,0,0,1,0],
-               [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
-
+# x1 = np.array([
+#     [1],
+#     [2],
+#     [3],
+#     [4],
+#     [5],
+#     [6],
+#     [7],
+#     [8],
+#     [9],
+#     [10]
+# ]) 
+# y1 = np.array([[1,0,0,0,0,0,0,0,0,0],
+#                [0,1,0,0,0,0,0,0,0,0],
+#                [0,0,1,0,0,0,0,0,0,0],
+#                [0,0,0,1,0,0,0,0,0,0],
+#                [0,0,0,0,1,0,0,0,0,0],
+#                [0,0,0,0,0,1,0,0,0,0],
+#                [0,0,0,0,0,0,1,0,0,0],
+#                [0,0,0,0,0,0,0,1,0,0],
+#                [0,0,0,0,0,0,0,0,1,0],
+#                [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
+x1 =X_image
+y1 =Y_label
 sets = [1,2,3,4,5,6,7,8,9] # for normal number guessing
 sets_adv = [0,1,2,3,4,5,6,7,8,9] # for MINST label
 
-model = NeuralBrain(x1,y1,input_size=1 , hidden_size=10 , output_size=10,lr=0.01)
+model = NeuralBrain(x1,y1,input_size=784 , hidden_size=128 , output_size=10,lr=0.01)
 while(True):
     os.system('cls')
     loading_screen()
@@ -65,29 +69,30 @@ while(True):
         print("Error Enter Number!!!")
     match ask:
         case 1:
-            stop_spinning.clear() # clears set if True
-            # Define what threading action is to be assigned
-            t = threading.Thread(target=parallel_screen,args=(stop_spinning,)) # function and set args
-            t.start() # start spinning animation
-            try:
-                model.train(1000000)
-            finally:
-                stop_spinning.set() # Returns True for while loop to stop
-                t.join() # Ensures the seperated threads join to acts on the main 
+            # stop_spinning.clear() # clears set if True
+            # # Define what threading action is to be assigned
+            # t = threading.Thread(target=parallel_screen,args=(stop_spinning,)) # function and set args
+            # t.start() # start spinning animation
+            # try:
+            model.train(1000)
+            # finally:
+            #     stop_spinning.set() # Returns True for while loop to stop
+            #     t.join() # Ensures the seperated threads join to acts on the main 
             
             model.learn()
             model.graphplot()
+            break
 
         
         case 2:
             model.remember()
             try:
-                a = int(input("Enter a number "))
+                a = int(input("Enter a number (1-9) image:  "))
                 final=model.forward_propagation([[a]])
                 print(final)
                 print("Softmax: ")
                 print(model.softmax())
-                print(f"The guess is : {sets[np.argmax(model.softmax())]}")
+                print(f"The guess is : {sets_adv[np.argmax(model.softmax())]}")
             except:
                 print("Enter a number !!!!!")
                 
@@ -96,7 +101,7 @@ while(True):
         case 3:
             
             try:
-                 ask = int(input("Do you really want to delete(1/0)"))
+                 ask = int(input("Do you really want to delete(1/0) : "))
                  if ask == 1:
                     loading_screen()
                     model.forget()
