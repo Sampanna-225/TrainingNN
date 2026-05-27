@@ -23,7 +23,7 @@ def unzip_image(target:str) -> np.ndarray:
     """
     with gzip.open(target,'rb') as f:
         X_data = np.frombuffer(f.read(), dtype=np.uint8, offset=16)
-        return X_data.reshape(-1,784)/255
+        return X_data.reshape(-1,784)/255.0
     
     
 def unzip_label(target:str) -> np.ndarray:

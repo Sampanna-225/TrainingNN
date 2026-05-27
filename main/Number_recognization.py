@@ -17,6 +17,10 @@ if parent_dir not in sys.path:
 file_path = os.path.basename(__file__)# file path
 file_name = os.path.join(dir_path,f"{os.path.splitext(file_path)[0]}.npz")# remove extension
 
+#image
+data_folder = os.path.join(parent_dir,"data")
+test_img = os.path.join(data_folder,"3.png")
+
 from brain.NetBrain import NeuralBrain
 from ui.animation import loading_screen
 from ui.animation import parallel_screen
@@ -29,7 +33,17 @@ from data.unzip import y_label_test
 # Assigning a thread event
 stop_spinning = threading.Event()
 
+def image_converter(pathname:str) -> np.ndarray: 
+    grey_scale = cv2.imread(pathname, cv2.IMREAD_GRAYSCALE)
 
+    if grey_scale is None:
+        raise FileNotFoundError("The image file is not loaded or corrpted")
+    
+    resize = cv2.resize(grey_scale, (28,28), interpolation=cv2.INTER_AREA)
+
+    normalize = resize.astype(np.float64)/255.0
+
+    return normalize.reshape(-1,784) # production fromat
 
 # x1 = np.array([
 #     [1],
@@ -58,7 +72,7 @@ y1 =Y_label
 sets = [1,2,3,4,5,6,7,8,9] # for normal number guessing
 sets_adv = [0,1,2,3,4,5,6,7,8,9] # for MINST label
 
-model = NeuralBrain(x1,y1,input_size=784 , hidden_size=128 , output_size=10,lr=0.01)
+model = NeuralBrain(x1,y1,input_size=784 , hidden_size=128 , output_size=10,lr=0.0001)
 while(True):
     os.system('cls')
     loading_screen()
@@ -74,30 +88,26 @@ while(True):
             # t = threading.Thread(target=parallel_screen,args=(stop_spinning,)) # function and set args
             # t.start() # start spinning animation
             # try:
-            model.train(1000)
+            model.train(1001)
             # finally:
             #     stop_spinning.set() # Returns True for while loop to stop
             #     t.join() # Ensures the seperated threads join to acts on the main 
             
             model.learn()
             model.graphplot()
-            break
+            continue
 
         
         case 2:
             model.remember()
             try:
-                a = int(input("Enter a number (1-9) image:  "))
-                final=model.forward_propagation([[a]])
-                print(final)
-                print("Softmax: ")
-                print(model.softmax())
-                print(f"The guess is : {sets_adv[np.argmax(model.softmax())]}")
-            except:
-                print("Enter a number !!!!!")
+               temp =  image_converter(test_img)
+               model.forward_propagation(temp)
+               answer = sets_adv[np.argmax(model.softmax())]
+               print(f"\n The Prediction is {answer}")
+            except FileNotFoundError as e:
+                print(e)
                 
-            
-
         case 3:
             
             try:
