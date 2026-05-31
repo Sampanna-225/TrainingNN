@@ -10,7 +10,11 @@ def sigmoid(x): #to get non linear output
 def sigmoid_derivative(x): #to get the derivative of sigmoid function
     return x*(1-x) # expected value of sigmoid function 
 
+def RelU(x):
+    return np.maximum(0,x)
 
+def RelU_grad(z):
+    return (z > 0).astype(float)
 #Functions like input layer --> hidden layer --> output layer
 # Class creation for training
 
@@ -38,12 +42,12 @@ class NeuralBrain:
         self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
         
         # takes random value for weight of range of input layer to hidden layer
-        self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(2.0 / self.input_size)#randn gives +ve to -ve value
+        self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(1.0 / self.input_size)#randn gives +ve to -ve value
         # takes bias value for hidden layer
-        self.__B1 = np.zeros((1,self.hidden_size))* np.sqrt(2.0 / self.hidden_size)# 1 to avoid shape mismatch
+        self.__B1 = np.zeros((1,self.hidden_size))* np.sqrt(1.0 / self.hidden_size)# 1 to avoid shape mismatch
                                                 #zeros as starting 0 is inital
         # takes random value for weight of range of hidden layer to output layer
-        self.__W2 = np.random.randn(self.hidden_size,self.output_size)
+        self.__W2 = np.random.randn(self.hidden_size,self.output_size)*np.sqrt(1.0 / self.hidden_size)
         # takes bias value for output layer
         self.__B2 = np.zeros((1,self.output_size)) # 1 to avoid shape mismatch
                                                  #zeros as starting 0 is inital
@@ -59,15 +63,17 @@ class NeuralBrain:
         Returns:
             np.ndarray: The activated output of the final layer.
         """
-
+        self.cx = x
         # from input to hidden tinkering with weight and bias
         # directly passed x helps reusability
         self.z1 = np.dot(x,self.__W1) + self.__B1 #Main concept == x.__W1 + __B1 __> output of hidden layer
-        self.a1 = sigmoid(self.z1) #activation function
+        # self.a1 = sigmoid(self.z1) #activation function
+        self.a1 = RelU(self.z1)
 
         # from hidden to output tinkering with weight and bias
         self.z2 = np.dot(self.a1,self.__W2) + self.__B2 #Main concept == a1.__W2 + __B2
-        self.a2 = sigmoid(self.z2) #activation function
+        # self.a2 = sigmoid(self.z2) #activation function
+        self.a2 = sigmoid(self.z2)
         return self.a2 #final output of forward propagation
 
     def backward_propagation(self, output:np.ndarray) -> None:
@@ -85,19 +91,23 @@ class NeuralBrain:
         """
         # from output to hidden layer
         self.error = output - self.y #to know if the output obtained is greater or less than the required output.  
-        self.error_slope = sigmoid_derivative(output)*self.error
+        self.error_slope = self.error * sigmoid_derivative(output) #hybrid architecture
+        # self.error_slope = sigmoid_derivative(output)*self.error
+
+    
 
         #from hidden to input layer
         self.hidden_error = self.error_slope.dot(self.__W2.T) #==> matrix 3*2 . 2*3 == 3*3
-        self.hidden_error_slope = sigmoid_derivative(self.a1)*self.hidden_error
+        self.hidden_error_slope = self.hidden_error * RelU_grad(self.z1)
+        # self.hidden_error_slope = sigmoid_derivative(self.a1)*self.hidden_error
 
         #correcting values form output to hidden layer
-        self.__W2 -= self.a1.T.dot(self.error_slope)*self.lr # matrix multiplication dimensions. => based on value they recieve so hidden output
-        self.__B2 -= np.sum(self.error_slope,axis=0,keepdims=True)*self.lr #axis = 0 collapising rows
+        self.__W2 -= self.a1.T.dot(self.error_slope)*(self.lr/self.cx.shape[0]) # matrix multiplication dimensions. => based on value they recieve so hidden output
+        self.__B2 -= np.sum(self.error_slope,axis=0,keepdims=True)*(self.lr/self.cx.shape[0]) #axis = 0 collapising rows
         
         #correcting calues from hidden to outpu layer
-        self.__W1 -= self.x.T.dot(self.hidden_error_slope)*self.lr # based on value they recieve so x
-        self.__B1 -= np.sum(self.hidden_error_slope,axis=0,keepdims=True)*self.lr
+        self.__W1 -= self.cx.T.dot(self.hidden_error_slope)*(self.lr/self.cx.shape[0]) # based on value they recieve so x
+        self.__B1 -= np.sum(self.hidden_error_slope,axis=0,keepdims=True)*(self.lr/self.cx.shape[0])
 
     def train(self,process:int) -> None:
         """
@@ -112,7 +122,7 @@ class NeuralBrain:
         for epoch in tqdm(range(process)):
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
-            if epoch % 500 == 0 :
+            if epoch % 100 == 0 :
                 loss = np.mean((self.y-b)**2)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
@@ -122,9 +132,9 @@ class NeuralBrain:
                 # print(f"Loss {epoch} = {loss:.5f}")
 
     def softmax(self) -> np.ndarray: #softmax function that helps calculate the certainty e^x/sum(e^x)
-        self.numerator = np.exp(self.z2)
-        self.denomenator = np.sum(self.numerator)
-        return (self.numerator/self.denomenator)
+        self.numerator = np.exp(self.z2-np.max(self.z2, axis=-1 , keepdims=True))# Max subtraction added to prevent floating-point infinity overflow
+        self.denomenator = np.sum(self.numerator,axis=-1, keepdims=True)
+        return (self.numerator/self.denomenator) 
     
     def learn(self) -> None:
         np.savez_compressed(self.file_name,w1=self.__W1,w2=self.__W2,b1=self.__B1,b2 = self.__B2)
