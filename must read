@@ -40,3 +40,7 @@ Core logic of back-propagation:
 - do not go with the error slope oppose it ; if our output is larger than label(y) means error_slove +ve we oppose it to make our data less over our label(y) similarly if data is lower than our label(y) means error_slove -ve we oppose it to make our data more towards the label . This is the majic of gradient decent.
 
 Using .insert(0, ...) instead of .append(): append slaps your parent directory at the very dead end of Python's search list. If you have another library installed on your system named brain or data, Python might accidentally load that global library first. By using insert(0, parent_dir), you force Python to look inside your project folders first, completely preventing module naming conflicts!
+
+Cross entropy is used due the effect of tiny gradient of the sigmoid derivative affecting the high and low confidence samely.
+
+Future improvement: add mini batch training for effective result.
