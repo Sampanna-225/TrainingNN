@@ -42,14 +42,14 @@ class NeuralBrain:
         self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
         
         # takes random value for weight of range of input layer to hidden layer
-        self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(1.0 / self.input_size)#randn gives +ve to -ve value
+        self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(2.0 / self.input_size)#randn gives +ve to -ve value
         # takes bias value for hidden layer
-        self.__B1 = np.zeros((1,self.hidden_size))* np.sqrt(1.0 / self.hidden_size)# 1 to avoid shape mismatch
+        self.__B1 = np.zeros((1,self.hidden_size))# 1 to avoid shape mismatch
                                                 #zeros as starting 0 is inital
         # takes random value for weight of range of hidden layer to output layer
-        self.__W2 = np.random.randn(self.hidden_size,self.output_size)*np.sqrt(1.0 / self.hidden_size)
+        self.__W2 = np.random.randn(self.hidden_size,self.output_size)*np.sqrt(2.0 / self.hidden_size)
         # takes bias value for output layer
-        self.__B2 = np.zeros((1,self.output_size)) # 1 to avoid shape mismatch
+        self.__B2 = np.zeros((1,self.output_size))# 1 to avoid shape mismatch
                                                  #zeros as starting 0 is inital
                         
     
@@ -73,7 +73,7 @@ class NeuralBrain:
         # from hidden to output tinkering with weight and bias
         self.z2 = np.dot(self.a1,self.__W2) + self.__B2 #Main concept == a1.__W2 + __B2
         # self.a2 = sigmoid(self.z2) #activation function
-        self.a2 = self.softmax(self.z2)
+        self.a2 = self.softmax()
         return self.a2 #final output of forward propagation
 
     def backward_propagation(self, output:np.ndarray) -> None:
@@ -123,7 +123,7 @@ class NeuralBrain:
             b = self.forward_propagation(self.x)
             self.backward_propagation(b)
             if epoch % 100 == 0 :
-                loss = np.mean((self.y-b)**2)
+                loss = - np.sum(self.y*np.log(b+1e-16))/self.x.shape[0] # to calculate the loss of cross entropy process. the low decimal point is to avoid log(0)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
                     if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-8:
