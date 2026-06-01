@@ -40,9 +40,13 @@ def image_converter(pathname:str) -> np.ndarray:
     if grey_scale is None:
         raise FileNotFoundError("The image file is not loaded or corrpted")
     
-    resize = cv2.resize(grey_scale, (28,28), interpolation=cv2.INTER_AREA)
+    resize = 255-cv2.resize(grey_scale, (20,20), interpolation=cv2.INTER_AREA) # 20 to compensate the padding
 
-    normalize = resize.astype(np.float64)/255.0
+    h ,w = resize.shape
+    h_pad , w_pad = 4, 4# 4 pixels of padding on all ends so the final becomes (20+8,20+8)
+    padded = cv2.copyMakeBorder(resize, h_pad, h_pad, w_pad, w_pad, cv2.BORDER_CONSTANT, value=0)#padds the images with value=0(black)
+
+    normalize = padded.astype(np.float64)/255.0
 
     return normalize.reshape(-1,784) # production fromat
 
@@ -89,7 +93,7 @@ while(True):
             # t = threading.Thread(target=parallel_screen,args=(stop_spinning,)) # function and set args
             # t.start() # start spinning animation
             # try:
-            model.train(500)
+            model.train(1000)
             # finally:
             #     stop_spinning.set() # Returns True for while loop to stop
             #     t.join() # Ensures the seperated threads join to acts on the main 
@@ -105,12 +109,12 @@ while(True):
                a =input("Enter a image number: ")
                test_img = os.path.join(data_folder,f"{a}.png")
                temp =  image_converter(test_img)
-               model.forward_propagation(temp)
-               answer = sets_adv[np.argmax(model.softmax())]
+               
+               answer = sets_adv[np.argmax(model.forward_propagation(temp))]
                print(f"\n The Prediction is {answer}\n")
-               print(model.softmax())
+               print(model.forward_propagation(temp))
                print(test_img)
-               continue
+               
             except FileNotFoundError as e:
                 print(e)
                 
@@ -138,7 +142,11 @@ while(True):
             time.sleep(1)
             continue
     
-    ask = int(input("101 to exit -->"))
-    if ask == 101:
-        break
+    try:
+        ask = input("101 to exit --> or press any to continue")
+        if ask == "101":
+            break
+
+    except:
+        continue
 

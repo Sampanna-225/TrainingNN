@@ -11,10 +11,10 @@ def sigmoid_derivative(x): #to get the derivative of sigmoid function
     return x*(1-x) # expected value of sigmoid function 
 
 def RelU(x):
-    return np.maximum(0,x)
+    return np.where(x>0 , x , x * 0.01)
 
 def RelU_grad(z):
-    return (z > 0).astype(float)
+    return np.where(z>0 , 1 , 0.01)
 #Functions like input layer --> hidden layer --> output layer
 # Class creation for training
 
@@ -73,7 +73,7 @@ class NeuralBrain:
         # from hidden to output tinkering with weight and bias
         self.z2 = np.dot(self.a1,self.__W2) + self.__B2 #Main concept == a1.__W2 + __B2
         # self.a2 = sigmoid(self.z2) #activation function
-        self.a2 = sigmoid(self.z2)
+        self.a2 = self.softmax(self.z2)
         return self.a2 #final output of forward propagation
 
     def backward_propagation(self, output:np.ndarray) -> None:
@@ -89,9 +89,9 @@ class NeuralBrain:
         We use gradient decent -= rather than += becuase we want to oppose the direction for the error gradient to make it as mininmum error as possible.
 
         """
-        # from output to hidden layer
-        self.error = output - self.y #to know if the output obtained is greater or less than the required output.  
-        self.error_slope = self.error * sigmoid_derivative(output) #hybrid architecture
+        # from output to hidden layer CROSS ENTROPY
+        self.error_slope = output - self.y #to know if the output obtained is greater or less than the required output.  
+        # self.error_slope = self.error * sigmoid_derivative(output) #hybrid architecture
         # self.error_slope = sigmoid_derivative(output)*self.error
 
     
