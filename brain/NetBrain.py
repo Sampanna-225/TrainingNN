@@ -15,6 +15,7 @@ def RelU(x):
 
 def RelU_grad(z):
     return np.where(z>0 , 1 , 0.01)
+
 #Functions like input layer --> hidden layer --> output layer
 # Class creation for training
 
@@ -53,7 +54,7 @@ class NeuralBrain:
                                                  #zeros as starting 0 is inital
                         
     
-    def forward_propagation(self, x:np.ndarray) -> np.ndarray:
+    def forward_propagation(self, x1:np.ndarray) -> np.ndarray:
         """
         Standard process of forward biasing with equation x.w + b to alter data each layer
 
@@ -63,10 +64,10 @@ class NeuralBrain:
         Returns:
             np.ndarray: The activated output of the final layer.
         """
-        self.cx = x
+        self.cx = x1
         # from input to hidden tinkering with weight and bias
         # directly passed x helps reusability
-        self.z1 = np.dot(x,self.__W1) + self.__B1 #Main concept == x.__W1 + __B1 __> output of hidden layer
+        self.z1 = np.dot(x1,self.__W1) + self.__B1 #Main concept == x.__W1 + __B1 __> output of hidden layer
         # self.a1 = sigmoid(self.z1) #activation function
         self.a1 = RelU(self.z1)
 
@@ -89,6 +90,7 @@ class NeuralBrain:
         We use gradient decent -= rather than += becuase we want to oppose the direction for the error gradient to make it as mininmum error as possible.
 
         """
+        n = self.cx.shape[0]
         # from output to hidden layer CROSS ENTROPY
         self.error_slope = output - self.y #to know if the output obtained is greater or less than the required output.  
         # self.error_slope = self.error * sigmoid_derivative(output) #hybrid architecture
@@ -102,12 +104,12 @@ class NeuralBrain:
         # self.hidden_error_slope = sigmoid_derivative(self.a1)*self.hidden_error
 
         #correcting values form output to hidden layer
-        self.__W2 -= self.a1.T.dot(self.error_slope)*(self.lr/self.cx.shape[0]) # matrix multiplication dimensions. => based on value they recieve so hidden output
-        self.__B2 -= np.sum(self.error_slope,axis=0,keepdims=True)*(self.lr/self.cx.shape[0]) #axis = 0 collapising rows
+        self.__W2 -= self.a1.T.dot(self.error_slope)*(self.lr/n) # matrix multiplication dimensions. => based on value they recieve so hidden output
+        self.__B2 -= np.sum(self.error_slope,axis=0,keepdims=True)*(self.lr/n) #axis = 0 collapising rows
         
         #correcting calues from hidden to outpu layer
-        self.__W1 -= self.cx.T.dot(self.hidden_error_slope)*(self.lr/self.cx.shape[0]) # based on value they recieve so x
-        self.__B1 -= np.sum(self.hidden_error_slope,axis=0,keepdims=True)*(self.lr/self.cx.shape[0])
+        self.__W1 -= self.cx.T.dot(self.hidden_error_slope)*(self.lr/n) # based on value they recieve so x
+        self.__B1 -= np.sum(self.hidden_error_slope,axis=0,keepdims=True)*(self.lr/n)
 
     def train(self,process:int) -> None:
         """
@@ -126,7 +128,7 @@ class NeuralBrain:
                 loss = - np.sum(self.y*np.log(b+1e-16))/self.x.shape[0] # to calculate the loss of cross entropy process. the low decimal point is to avoid log(0)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
-                    if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-8:
+                    if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-11:
                         return #Float Point Precision tuning
                     
                 # print(f"Loss {epoch} = {loss:.5f}")
