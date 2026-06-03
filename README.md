@@ -1,7 +1,7 @@
-# ** ZERO DEPENDENCY (DENSE MLP) NEURAL NETWORK 
-![Python](https://img.shields.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![NumPy](https://img.shields.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
-![OpenCV](https://img.shields.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white)
+# ** ZERO DEPENDENCY (DENSE MLP) NEURAL NETWORK **
+[![Python](https://img.shields.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)](https://numpy.org/)
+[![OpenCV](https://img.shields.shields.io/badge/OpenCV-5C3EE8?style=flat&logo=opencv&logoColor=white)](https://opencv.org/)
 
 # Key Architectural Features
 
