@@ -32,6 +32,9 @@ But if we want to let the NN memorize multilple examples at once we do: (2D)
                [0,0,0,0,0,0,0,0,1,0],
                [0,0,0,0,0,0,0,0,0,1]]) # from 1 to 10
 
+sigmoid derivative takes post-activated value. (as derivate needs to be passed cause it is structurally written as that)
+RelU grad takes pre-activated value
+
 While handling small data there is not much error visible but at high volumes it is 
 Use gradient decent -= and never use += in a system calculating error = output - self.y1 as we want to oppose the gradient of error so our flow of data doesnt follow the error path but oppose it to get minimum error.
 use clip for big data as the data can cause overflow due to higher e^ value as the data increases which can also be solved using gradient decent.
