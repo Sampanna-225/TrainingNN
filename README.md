@@ -13,5 +13,5 @@
 * **Modular Pipeline Design:** Highly flexible design with various pipeline such as:
     * **Image Pipeline** : Auto cropping of handwritten numbers using cv2 (format: --> Non_Inverse)
     * **Zip Pipeline**   : Handles zipped folders `.zip` to extract required data into specific format for training samples.
-          * Image extraction (MINST Data)
-          * Prediction data (Titanic Data sets and e.t.c)
+          - Image extraction (MINST Data)
+          - Prediction data (Titanic Data sets and e.t.c)
