@@ -30,25 +30,11 @@ from data.unzip import X_image
 from data.unzip import X_image_test
 from data.unzip import Y_label
 from data.unzip import y_label_test
-
+from main.image import image_converter
 # Assigning a thread event
 stop_spinning = threading.Event()
 
-def image_converter(pathname:str) -> np.ndarray: 
-    grey_scale = cv2.imread(pathname, cv2.IMREAD_GRAYSCALE)
 
-    if grey_scale is None:
-        raise FileNotFoundError("The image file is not loaded or corrpted")
-    
-    resize = 255-cv2.resize(grey_scale, (20,20), interpolation=cv2.INTER_AREA) # 20 to compensate the padding
-
-    h ,w = resize.shape
-    h_pad , w_pad = 4, 4# 4 pixels of padding on all ends so the final becomes (20+8,20+8)
-    padded = cv2.copyMakeBorder(resize, h_pad, h_pad, w_pad, w_pad, cv2.BORDER_CONSTANT, value=0)#padds the images with value=0(black)
-
-    normalize = padded.astype(np.float64)/255.0
-
-    return normalize.reshape(-1,784) # production fromat
 
 # x1 = np.array([
 #     [1],
@@ -88,12 +74,13 @@ while(True):
         print("Error Enter Number!!!")
     match ask:
         case 1:
+            lo = int(input("Enter training epoch: "))
             # stop_spinning.clear() # clears set if True
             # # Define what threading action is to be assigned
             # t = threading.Thread(target=parallel_screen,args=(stop_spinning,)) # function and set args
             # t.start() # start spinning animation
             # try:
-            model.train(1000)
+            model.train(lo)
             # finally:
             #     stop_spinning.set() # Returns True for while loop to stop
             #     t.join() # Ensures the seperated threads join to acts on the main 
