@@ -1,0 +1,38 @@
+Usually the image is not perfectly at the center. Teaching a Neural Network an Image with MINST data set requires the image to be placed accordingly to the centre of mass of the image so the Neural Network can recognize it properly otherwise we need a CNN to gather up the noise and recognize the image. Feeding a image through cv2 pipeline requires the image to be greyscaled , should be modified by threshold value so every mix becomes either white or black based on pixel data , cropped and determined to be at the centre aligned using center of mass concept.
+
+In Cv2 there are different inbuilt modules that help make this job easier.
+cv2.threshold(img,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[index]
+This function gives a tuple as a returned value where the first index 0 represents the retval and 1 the modified image.
+- A retval is a floating-point number that represents the exact threshold we passed
+- In index 1 very value less than threshold is equal to the 0 and higher is equal to 255
+- THRESH_BINARY helps to convert the value into threshold value and THRESH_BINARY_INVRESE flips the binary value.
+- THERSH_OTSU helps auto adjust the threshold.
+
+The module use for cropping is :
+cv2.findNonZero(img_resup)
+- This helps find the coordinates of every pixel that is not black(0) and returns a 3D matrix
+Another beautiful function :
+cv2.boundingRect(3D)
+This pipleine must take the argument directly from the findNonZero function.
+- This function bounds or draws a rectangle over the the places where the image has white pixels so it covers all the places
+The final cropping is done through indexing.
+
+NOW for the most important part: IMAGE CENTRE OF MASS:
+this calculates where the tarteted pixels lie most in the image the centre that represents where the maximum density of the pixels lie on the canvas
+
+The standard formula of the centre of mass can be written as
+x' , y' = (M10)/(M00) , (M01)/(M00)
+
+Here the M10,M00,M01 are just spatial moments that calculates the properties of a pixel based on coodinates. Its formula is :
+THIS FORMULA IS SOLELEY FOR THE PURPOSE OF BINARY DATA NOT 2D MATRIX DATA
+Mpq = Submition(x).Submition(y)[(x^p).(y^q).I(x,y)]
+
+In calculus and theoretical image analysis, an image is treated as a continuous 2D function of light intensity, I(x, y).
+
+For Circle
+Here I(x,y) has analytical formula is 255 if x^2 + y^2 <= R          where R is radius of circle centered at the origin on a 
+                                      0   if x^2 + y^2 > R           black background.
+
+In cv2 I(x,y) represents the brightness (or weight) of the pixel located at coordinate (x, y). Its purpose in the moments formula is to act as a scaling factor:
+    - if pixel is bright, I(x,y) is large giving the coordinate heavy weight as in mass in calculation.
+    - if pixel is dark, I(x,y) is zero so completely erases the coordinate so it cant affect the centre of mass of the figure.
