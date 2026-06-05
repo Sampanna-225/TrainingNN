@@ -15,4 +15,4 @@
     * **Zip Pipeline**   : Handles zipped folders `.zip` to extract required data into specific format for training samples.
       * Image extraction (MINST Data)
       * Prediction data (Titanic Data sets and e.t.c)
-* **Handwritten Mini Batch Trainin: ** Small amount data are calculated normally but anything that exceeds 32 examples are taken mini batch training process.
+* **Handwritten Mini Batch Trainin:** Small amount data are calculated normally but anything that exceeds 32 examples are taken mini batch training process.
