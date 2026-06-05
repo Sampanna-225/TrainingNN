@@ -46,4 +46,12 @@ Using .insert(0, ...) instead of .append(): append slaps your parent directory a
 
 Cross entropy is used due the effect of tiny gradient of the sigmoid derivative affecting the high and low confidence samely.
 
+Mini Batching:
+- devides the large matrixes into small 32 batches representing bits.
+- indexes are formed in format A[x,y] so when [i:i+32] is taken we know only row is being taken which does not affect the input_size and any matrix mismatch issues as  they are completely dependent on the features not the number of examples passed. 
+- this makes it easier and faster for the machine to compute than just computing large dimensiona metrix at once.
+- it prevents mlp from memorizing the data with shuffle.
+- loops are organized by passing a matrix view instead of all the elements.
+- !!! Keep in mind manuplating with with the view can cause the real data to be changed permanently as it stores the pointer to the original data.
+
 Future improvement: add mini batch training for effective result.
