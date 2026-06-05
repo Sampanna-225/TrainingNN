@@ -1,5 +1,9 @@
 Usually the image is not perfectly at the center. Teaching a Neural Network an Image with MINST data set requires the image to be placed accordingly to the centre of mass of the image so the Neural Network can recognize it properly otherwise we need a CNN to gather up the noise and recognize the image. Feeding a image through cv2 pipeline requires the image to be greyscaled , should be modified by threshold value so every mix becomes either white or black based on pixel data , cropped and determined to be at the centre aligned using center of mass concept.
 
+In OpenCV and NumPy arrays, the origin coordinate (0, 0) sits at the absolute top-left corner of the image, not the bottom-left.
+    As you move from left to right, the x-coordinate increases.
+    As you move from top to bottom, the $y$-coordinate increases.
+    
 In Cv2 there are different inbuilt modules that help make this job easier.
 cv2.threshold(img,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[index]
 This function gives a tuple as a returned value where the first index 0 represents the retval and 1 the modified image.
