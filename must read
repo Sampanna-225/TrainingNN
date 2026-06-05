@@ -54,4 +54,4 @@ Mini Batching:
 - loops are organized by passing a matrix view instead of all the elements.
 - !!! Keep in mind manuplating with with the view can cause the real data to be changed permanently as it stores the pointer to the original data.
 
-Future improvement: add mini batch training for effective result.
+Future improvement: add mini batch training for effective result. off to CNN goodbye.
