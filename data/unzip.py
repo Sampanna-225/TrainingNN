@@ -41,6 +41,65 @@ def unzip_label(target:str) -> np.ndarray:
         temp = np.zeros((sample_num,10)) #2D
         temp[np.arange(sample_num),y_flat] = 1
         return temp
+    
+def min_max(li:list) -> list:
+    max0 = max(li)
+    min0 = min(li)
+    flist =[]
+    for i in li:
+        ans = (i-min0)/(max0-min0)
+        flist.append(ans)
+    return flist
+
+def extract_csv(target:str) -> np.ndarray:
+    with open("titanic.csv",mode="r",encoding='utf-8') as f:
+        #reads the first line to skip the header
+        header = f.readline()
+        Input_M =[]
+        survived= []
+        age_list =[]
+        fare_list = []
+        for line in f:
+            line = line.strip() # removes whitespaces and \m lines
+            if not line:
+                continue #skips 
+            
+            column = line.split(',') # arranges features into list that are seperated by ,
+            try:
+                survived.append(int(column[0]))
+                pclass = column[1]
+                sex = 0.0 if column[2].lower() == "male" else 1.0
+                age = float(column[3]) if column[3] else 28.0
+                age_list.append(age)
+                fare = float(column[6]) if column[6] else 14.45
+                fare_list.append(fare)
+                pclass_encoding = [0.0,0.0,0.0]
+                pclass_encoding[int(pclass)-1] = 1.0
+
+                
+                Input_M.append([pclass_encoding[0],pclass_encoding[1],pclass_encoding[2],sex,age,fare])
+            except (ValueError,IndexError):
+                continue
+        
+        mimx1 = min_max(age_list)
+        mimx2 = min_max(fare_list)
+        X = np.array(Input_M,dtype=np.float32)
+
+        X[:,4] = mimx1
+        X[:,5] = mimx2
+
+
+        survived_y = np.zeros((len(survived),2)) #-> it expects a tuple hence the ()
+        survived_y[np.arange(len(survived)),survived] = 1
+
+        
+        Y = np.array(survived_y,dtype=np.float32)
+
+        return X , Y , age_list , fare_list
+
+X_titanic , Y_titanic , a ,f = extract_csv
+
+
 
 X_image = unzip_image(paths["img_path"])
 X_image_test = unzip_image(paths["img_test_path"])
