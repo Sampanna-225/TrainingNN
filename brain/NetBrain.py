@@ -35,13 +35,18 @@ class NeuralBrain:
         self.x = x
         self.y = y
         self.lr = lr
+        self.mini_batch_shape = self.x.shape[0] if self.x < 32 else 32
         self.loss_history=[] 
         self.dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder to brain
         self.project_root = os.path.dirname(self.dir_path) # sets the directry one level up to initial file
         self.data_folder = os.path.join(self.project_root,"data")
         self.file_path = os.path.basename(__file__)# file path
-        self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}.npz")# remove extension
-        
+
+        if self.input_size >= 784:
+            self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}_image.npz")# remove extension
+        else:
+            self.file_name = os.path.join(self.data_folder,f"{os.path.splitext(self.file_path)[0]}_tabular.npz")
+
         # takes random value for weight of range of input layer to hidden layer
         self.__W1 = np.random.randn(self.input_size,self.hidden_size)* np.sqrt(2.0 / self.input_size)#randn gives +ve to -ve value
         # takes bias value for hidden layer
@@ -77,7 +82,7 @@ class NeuralBrain:
         self.a2 = self.softmax()
         return self.a2 #final output of forward propagation
 
-    def backward_propagation(self, output:np.ndarray) -> None:
+    def backward_propagation(self, output:np.ndarray,batching_y:np.ndarray) -> None:
         """
         backwards checking with error gradient wise change.
 
@@ -90,9 +95,9 @@ class NeuralBrain:
         We use gradient decent -= rather than += becuase we want to oppose the direction for the error gradient to make it as mininmum error as possible.
 
         """
-        n = self.cx.shape[0]
+        n = self.mini_batch_shape
         # from output to hidden layer CROSS ENTROPY
-        self.error_slope = output - self.y #to know if the output obtained is greater or less than the required output.  
+        self.error_slope = output - batching_y #to know if the output obtained is greater or less than the required output.  
         # self.error_slope = self.error * sigmoid_derivative(output) #hybrid architecture
         # self.error_slope = sigmoid_derivative(output)*self.error
 
@@ -122,10 +127,25 @@ class NeuralBrain:
             None
         """
         for epoch in tqdm(range(process)):
-            b = self.forward_propagation(self.x)
-            self.backward_propagation(b)
+
+            index = np.arange(self.x.shape[0]) # creates a 1D array of element 0 to rows of self.x
+            np.random.shuffle(index) # suffles the indexes so the machine doesnt end up memorizing
+
+            X_shuffled = self.x[index] #creates a view of metadata of the array of the row index 0 to shape[0]; hence pointer is stored to optimize the loops.
+            Y_shuffled = self.y[index]
+
+            for i in range(0,self.x.shape[0],32): # in range from 0 to excluisve rows of x in step 32
+                Batch_x = X_shuffled[i:i+32] # only row indexing as the indexing of a 2D matrix is of A[x,y]
+                Batch_y = Y_shuffled[i:i+32]
+                self.mini_batch_shape = Batch_x.shape[0]
+
+                b = self.forward_propagation(Batch_x) # mini packets forward bias
+
+                self.backward_propagation(b,Batch_y) # backward bias of mini packets
+
             if epoch % 100 == 0 :
-                loss = - np.sum(self.y*np.log(b+1e-16))/self.x.shape[0] # to calculate the loss of cross entropy process. the low decimal point is to avoid log(0)
+                check = self.forward_propagation(self.x) # due to mini batching passing 32 sliced batch , we check by passing a full forward propagation to accumulate the loss of the whole data.
+                loss = - np.sum(self.y*np.log(check+1e-16))/self.x.shape[0] # to calculate the loss of cross entropy process. the low decimal point is to avoid log(0)
                 self.loss_history.append(loss) # to know learning rate
                 if len(self.loss_history) >=10:
                     if max(self.loss_history[-10: ]) - min(self.loss_history[-10: ]) <1e-11:
