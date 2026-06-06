@@ -55,3 +55,6 @@ Mini Batching:
 - !!! Keep in mind manuplating with with the view can cause the real data to be changed permanently as it stores the pointer to the original data.
 
 Future improvement: add mini batch training for effective result. off to CNN goodbye.
+Training tips:
+- Image :- 1100 epoch
+- Titanic :- approx 10000 epoch
