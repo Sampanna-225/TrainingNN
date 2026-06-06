@@ -9,6 +9,7 @@ paths= {
     "img_test_path" : os.path.join(dir, "t10k-images-idx3-ubyte.gz"),
     "label_path" : os.path.join(dir, "train-labels-idx1-ubyte.gz"),
     "label_test_path" : os.path.join(dir, "t10k-labels-idx1-ubyte.gz"),
+    "titanic_x_path" : os.path.join(dir,"titanic.csv")
 }
 
 for key, filept in paths.items():
@@ -52,7 +53,7 @@ def min_max(li:list) -> list:
     return flist
 
 def extract_csv(target:str) -> np.ndarray:
-    with open("titanic.csv",mode="r",encoding='utf-8') as f:
+    with open(target,mode="r",encoding='utf-8') as f:
         #reads the first line to skip the header
         header = f.readline()
         Input_M =[]
@@ -60,7 +61,7 @@ def extract_csv(target:str) -> np.ndarray:
         age_list =[]
         fare_list = []
         for line in f:
-            line = line.strip() # removes whitespaces and \m lines
+            line = line.strip() # removes whitespaces and \n lines
             if not line:
                 continue #skips 
             
@@ -97,7 +98,7 @@ def extract_csv(target:str) -> np.ndarray:
 
         return X , Y , age_list , fare_list
 
-X_titanic , Y_titanic , a ,f = extract_csv
+X_titanic , Y_titanic , a ,f = extract_csv(paths["titanic_x_path"])
 
 
 
