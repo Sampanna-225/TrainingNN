@@ -35,7 +35,7 @@ class NeuralBrain:
         self.x = x
         self.y = y
         self.lr = lr
-        self.mini_batch_shape = self.x.shape[0] if self.x < 32 else 32
+        self.mini_batch_shape = self.x.shape[0] if self.x.shape[0] < 32 else 32
         self.loss_history=[] 
         self.dir_path = os.path.dirname(os.path.abspath(__file__)) # get absolute path of the folder to brain
         self.project_root = os.path.dirname(self.dir_path) # sets the directry one level up to initial file
