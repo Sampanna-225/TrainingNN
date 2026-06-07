@@ -120,8 +120,8 @@ while(True):
             try:
                 if ask == 1:
                     model_image.remember()
-                    a =input("Enter a image number: ")
-                    test_img = os.path.join(data_folder,f"{a}.png")
+                    imga =input("Enter a image number: ")
+                    test_img = os.path.join(data_folder,f"{imga}.png")
                     temp =  image_converter(test_img)
 
                     answer = sets_adv[np.argmax(model_image.forward_propagation(temp))]
